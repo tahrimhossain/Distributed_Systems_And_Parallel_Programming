@@ -1,0 +1,11 @@
+sudo launchctl start com.apple.rpcbind
+
+rpcgen -a -C matrixOp.x
+
+gcc -g -DRPC_SVC_FG -c -o matrixOp_clnt.o matrixOp_clnt.c
+gcc -g -DRPC_SVC_FG -c -o matrixOp_client.o matrixOp_client.c
+gcc -g -DRPC_SVC_FG -c -o matrixOp_xdr.o matrixOp_xdr.c
+gcc -g -DRPC_SVC_FG -o matrixOp_client matrixOp_clnt.o matrixOp_client.o matrixOp_xdr.o 
+gcc -g -DRPC_SVC_FG -c -o matrixOp_svc.o matrixOp_svc.c
+gcc -g -DRPC_SVC_FG -c -o matrixOp_server.o matrixOp_server.c
+gcc -g -DRPC_SVC_FG -o matrixOp_server matrixOp_svc.o matrixOp_server.o matrixOp_xdr.o
