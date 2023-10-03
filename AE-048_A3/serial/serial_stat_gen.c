@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     }
 
     if(rank == 0){
-        for(int j = 1; j <= 500; j++){
+        for(int j = 1000000; j <= 5000000; j+=1000000){
 
             n = j;
 
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 
             end_time = MPI_Wtime();
 
-            fprintf(file, "%d %.9lf\n", n,(end_time-start_time)*1e9);
+            fprintf(file, "%d %d %.9lf\n", n,1,(end_time-start_time)*1e9);
 
             //printf("pi is approximately %.16f, Error is %.16f\n",pi, fabs(pi - PI25DT));
         }

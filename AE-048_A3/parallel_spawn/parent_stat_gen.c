@@ -29,11 +29,11 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        for ( int k = 20; k <= 25; k++)
+        for ( int k = 1000000; k <= 5000000; k+=1000000)
         {
-            fprintf(file, "%d\n",k);
+            //fprintf(file, "%d\n",k);
 
-            for (int j = 2; j <= 20; j++)
+            for (int j = 5; j <= 10; j++)
             {
                 int num_child_processes;
                 num_child_processes = j; 
@@ -66,10 +66,11 @@ int main(int argc, char* argv[]) {
         
                 double start_time, end_time;
 
-                start_time = MPI_Wtime();
                 // Spawn multiple child processes
                 spawn_error = MPI_Comm_spawn("./child_program", child_argv, num_child_processes, MPI_INFO_NULL, 0, MPI_COMM_SELF, &child_comm, MPI_ERRCODES_IGNORE);
 
+                start_time = MPI_Wtime();    
+                
                 if (spawn_error != MPI_SUCCESS) {
                     printf("Error spawning child processes. Exiting.\n");
                     MPI_Abort(MPI_COMM_WORLD, 1);
@@ -86,10 +87,10 @@ int main(int argc, char* argv[]) {
                     pi += val;
                 }
 
-                printf("pi is approximately %.16f, Error is %.16f\n",pi, fabs(pi - PI25DT));
+                //printf("pi is approximately %.16f, Error is %.16f\n",pi, fabs(pi - PI25DT));
                 MPI_Barrier(child_comm);
                 end_time = MPI_Wtime();
-                fprintf(file, "%d %.9lf\n", num_child_processes,(end_time-start_time)*1e9);
+                fprintf(file, "%d %d %.9lf\n", num_of_intervals,num_child_processes,((end_time-start_time)*1e9));
                 MPI_Comm_disconnect(&child_comm); 
             }
         }
