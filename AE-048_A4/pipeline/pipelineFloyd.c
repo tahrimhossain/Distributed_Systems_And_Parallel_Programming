@@ -197,10 +197,6 @@ int main(int argc, char** argv) {
         numberOfNodes = atoi(argv[1]);
     }
 
-    if(rank == 0 && stat_gen == 1){
-        start_time = MPI_Wtime();
-    }
-    
     int** random2dArray = NULL;
     int* flatArray = NULL;
 
@@ -223,6 +219,9 @@ int main(int argc, char** argv) {
         flatArray = flattenArray(random2dArray,numberOfNodes);
     }
 
+    if(rank == 0 && stat_gen == 1){
+        start_time = MPI_Wtime();
+    }
 
     MPI_Bcast(&numberOfNodes, 1, MPI_INT, 0, MPI_COMM_WORLD);
     
@@ -390,12 +389,14 @@ int main(int argc, char** argv) {
 
         //printf("Shortest distances between every pair of nodes in after executing floyd-warshall algorithm in parallel:\n");
         //print2dArray(random2dArray,numberOfNodes);
+        if(rank == 0 && stat_gen == 1){
+            end_time = MPI_Wtime();
+        }
         write2dArrayToFile(random2dArray,numberOfNodes);
     }
     
 
     if(rank == 0 && stat_gen == 1){
-        end_time = MPI_Wtime();
         
         FILE *file = fopen("stat.txt", "a");
 

@@ -59,7 +59,7 @@ void print2dArray(int** array, int n) {
     }
 }
 //sequential floyd warshall
-void floydWarshall(int numNodes, int** graph) {
+int** floydWarshall(int numNodes, int** graph) {
     // Allocate memory for the distance matrix
     int** dist = (int**)malloc(numNodes * sizeof(int*));
     for (int i = 0; i < numNodes; i++) {
@@ -85,10 +85,13 @@ void floydWarshall(int numNodes, int** graph) {
         }
     }
 
+    return dist;
+
     // Print the shortest distances
     //printf("Shortest distances between every pair of nodes:\n");
     //print2dArray(dist,numNodes);
 
+    /*
     write2dArrayToFile(dist,numNodes);
 
     // Free the allocated memory
@@ -96,6 +99,7 @@ void floydWarshall(int numNodes, int** graph) {
         free(dist[i]);
     }
     free(dist);
+    */
 }
 
 int main(int argc, char** argv) {
@@ -141,12 +145,17 @@ int main(int argc, char** argv) {
 	}
     
 
-	floydWarshall(numberOfNodes,arr);
+	arr = floydWarshall(numberOfNodes,arr);
+
+    if(stat_gen == 1){
+
+		end_time = MPI_Wtime();
+	}
 	
+    write2dArrayToFile(arr,numberOfNodes);
+
 	if(stat_gen == 1){
 		
-		end_time = MPI_Wtime();
-
 		FILE *file = fopen("stat.txt", "a");
 
         if (file == NULL) {

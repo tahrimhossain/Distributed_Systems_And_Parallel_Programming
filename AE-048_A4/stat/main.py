@@ -1,5 +1,5 @@
 import subprocess
-
+import matplotlib.pyplot as plt
 
 def compare_files(file1_path, file2_path):
     # Read the contents of the first file
@@ -29,35 +29,87 @@ def generateInput(n):
     print("Return Code:", result.returncode)
 
 def runSerial(n):
-    command = 'cd ../serial && mpicc -o main main.c -lm && mpirun -np 1 ./main '+str(n)
+    command = 'cd ../serial && mpicc -o serialFloyd serialFloyd.c -lm && mpirun -np 1 ./serialFloyd '+str(n)
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     print("Output:", result.stdout)
     print("Return Code:", result.returncode)
 
 
 def runParallel(n,p):
-    command = 'cd ../parallel && mpicc -o main main.c -lm && mpirun --oversubscribe -np '+str(p)+' ./main '+str(n)
+    command = 'cd ../parallel && mpicc -o parallelFloyd parallelFloyd.c -lm && mpirun --oversubscribe -np '+str(p)+' ./parallelFloyd '+str(n)
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     print("Output:", result.stdout)
     print("Return Code:", result.returncode)
 
 
 def runPipeline(n,p):
-    command = 'cd ../pipeline && mpicc -o main main.c -lm && mpirun --oversubscribe -np '+str(p)+' ./main '+str(n)
+    command = 'cd ../pipeline && mpicc -o pipelineFloyd pipelineFloyd.c -lm && mpirun --oversubscribe -np '+str(p)+' ./pipelineFloyd '+str(n)
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     print("Output:", result.stdout)
     print("Return Code:", result.returncode)
 
+def generateStat():
+    n = [240,480,720]
+    p = [4,9,16]
+    clean()
+    for nodes in n:
+        generateInput(nodes)
+        runSerial(nodes)
+        for processes in p:
+            runParallel(nodes,processes)
+            runPipeline(nodes,processes)
+            print(compare_files('../serial/output.txt','../parallel/output.txt'))
+            print(compare_files('../serial/output.txt','../pipeline/output.txt'))
+
+def parse_data(file_path):
+    # Initialize an empty dictionary to store the parsed data
+    data = {}
+
+    # Read the file and parse the content
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    for line in lines:
+        # Split the line into key and value parts
+        parts = line.strip().split()
+
+        # Convert key and inner_key to appropriate types
+        num_of_nodes = int(parts[0])
+        num_of_processors = int(parts[1])
+        runtime = float(parts[2])
+
+        # Create or update the nested dictionary
+        if num_of_nodes not in data:
+            data[num_of_nodes] = {}
+        data[num_of_nodes][num_of_processors] = runtime
+
+    return data
+
+# Example usage
+def showGraph(file_path):
+    parallel_data = parse_data(file_path)
+    serial_data = parse_data('../serial/stat.txt')
+    for num_of_nodes, inner_data in parallel_data.items():
+        for num_of_processors,_ in inner_data.items():
+            inner_data[num_of_processors] = serial_data[num_of_nodes][1]/inner_data[num_of_processors]
+        inner_keys = list(inner_data.keys())
+        speedup = list(inner_data.values())
+        plt.plot(inner_keys, speedup, label=f'Number of intervals {num_of_nodes}')
+
+    plt.xlabel('Number of processors')
+    plt.ylabel('Speedup')
+    plt.title('Number of nodes')
+    plt.legend()
+    plt.savefig(file_path.split("/")[-2])
+    plt.show()
 
 
-n = [20,30,40]
-p = [4,9,16]
-clean()
-for index in range(len(n)):
-    generateInput(n[index])
-    runSerial(n[index])
-    runParallel(n[index],p[index])
-    runPipeline(n[index],p[index])
-    print(compare_files('../serial/output.txt','../parallel/output.txt'))
-    print(compare_files('../serial/output.txt','../pipeline/output.txt'))
 
+
+
+
+
+
+generateStat()
+showGraph('../parallel/stat.txt')
+showGraph('../pipeline/stat.txt')

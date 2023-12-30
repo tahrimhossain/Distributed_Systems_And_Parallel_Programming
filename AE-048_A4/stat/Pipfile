@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 "subprocess.run" = "*"
+matplotlib = "*"
 
 [dev-packages]
 
