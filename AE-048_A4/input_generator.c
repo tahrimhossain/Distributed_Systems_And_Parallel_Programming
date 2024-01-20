@@ -2,17 +2,24 @@
 #include <stdlib.h>
 #include <time.h>
 
+int generateRandomWeight() {
+    return rand() % 991 + 10; // Generates random weight between 10 and 1000
+}
+
 int** fillRandom2dArray(int n) {
     int** randomArray = (int**)malloc(n * sizeof(int*));
     for (int i = 0; i < n; ++i) {
         randomArray[i] = (int*)malloc(n * sizeof(int));
     }
 
-    srand(time(NULL));  // Seed for random number generation
-
     for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            randomArray[i][j] = rand() % 10 + 1;  // Generates random number between 1 and 10
+        randomArray[i][i] = 0;
+    }
+    for (int i = 0; i < n; ++i) {
+        for (int j = i+1; j < n; ++j) {
+
+            randomArray[i][j] = generateRandomWeight();
+            randomArray[j][i] = randomArray[i][j];
         }
     }
 
@@ -84,6 +91,8 @@ int main(int argc, char *argv[]) {
         printf("Usage: %s <integer>\n", argv[0]);
         return 1;  // Return an error code
     }
+
+    srand(time(0));
 
     // Convert the second command line argument to an integer
     int n = atoi(argv[1]);

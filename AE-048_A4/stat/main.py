@@ -53,13 +53,23 @@ def generateStat():
     p = [4,9,16]
     clean()
     for nodes in n:
+        print("Current number of nodes ", nodes)
         generateInput(nodes)
         runSerial(nodes)
         for processes in p:
             runParallel(nodes,processes)
             runPipeline(nodes,processes)
-            print(compare_files('../serial/output.txt','../parallel/output.txt'))
-            print(compare_files('../serial/output.txt','../pipeline/output.txt'))
+            if compare_files('../serial/output.txt','../parallel/output.txt') == True :
+                print("Output of ../serial/output.txt and ../parallel/output.txt are equal")
+            else :
+                print("Output of ../serial/output.txt and ../parallel/output.txt are not equal")
+
+            if compare_files('../serial/output.txt','../pipeline/output.txt') == True :
+                print("Output of ../serial/output.txt and ../pipeline/output.txt are equal")
+            else :
+                print("Output of ../serial/output.txt and ../pipeline/output.txt are not equal")
+            #print("Ran parallel and pipeline with number of processors:",processes)
+            #input("Press enter to continue")
 
 def parse_data(file_path):
     # Initialize an empty dictionary to store the parsed data
